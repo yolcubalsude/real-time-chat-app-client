@@ -1,3 +1,6 @@
+import Chat from './Chat';
+import React from "react";
+import { useState } from "react";
 import './App.css';
 import { io } from "socket.io-client";
 const socket = io("http://localhost:3001");
@@ -11,25 +14,28 @@ function App() {
       socket.emit("join_room", room);
     }
   };
+ 
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div>Hello World</div>
-        <button onClick={() => socket.emit("join_room", 123)}>Join Room</button>
-        <button onClick={() => socket.emit("send_message", "Hello")}>Send Message</button>
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h3>Join A Chat</h3>
+        <input type="text" 
+        placeholder="Room ID..." 
+        onChange={(event) => {
+          setRoom(event.target.value)
+          }}
+          value={room}
+          />
+
+          <input type="text" 
+          placeholder="Username..." 
+          onChange={(event) => {
+            setUsername(event.target.value)
+            }}
+            value={username}
+            />
+        <button onClick={joinRoom}>Join A Room</button>
+        <Chat socket={socket} username={username} room={room}/>
     </div>
   ); 
 }
