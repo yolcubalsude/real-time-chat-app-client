@@ -25,7 +25,7 @@
 }
 
 .App-link {
-  color: #61dafb;
+  color: #ea7f33;
 }
 
 @keyframes App-logo-spin {
@@ -36,3 +36,85 @@
     transform: rotate(360deg);
   }
 }
+.message-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.username {
+  font-weight: bold;
+  color: #3b82f6;
+}
+
+.text {
+  flex: 1;
+}
+
+.time {
+  font-size: 0.75em;
+  color: rgb(255, 34, 0);
+  margin-left: 8px;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+.message-author {
+  font-weight: bold;
+  color: #3b82f6;
+}
+
+.message-text {
+  flex: 1;
+}
+
+.message-time {
+  font-size: 0.75em;
+  color: rgb(255, 34, 0);
+  margin-left: 8px;
+}
+
+.message {
+  display: flex;
+  margin: 6px 10px;
+}
+
+#you {
+  justify-content: flex-end;
+}
+
+#you .message-meta {
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+#you .message-author,
+#you .message-time {
+  color: #fff;
+}
+
+#other {
+  justify-content: flex-start;
+}
+
+#other .message-meta {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+#other .message-author {
+  color: #3b82f6;
+}
+
+
+

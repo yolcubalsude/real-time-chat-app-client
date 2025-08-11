@@ -14,7 +14,9 @@ function Chat({ socket, username, room }) {
         time:
           new Date(Date.now()).getHours() +
           ":" +
-          new Date(Date.now()).getMinutes(),
+          (new Date(Date.now()).getMinutes() < 10
+            ? "0" + new Date(Date.now()).getMinutes()
+            : new Date(Date.now()).getMinutes()),
       };
 
       await socket.emit("send_message", messageData);
@@ -24,9 +26,13 @@ function Chat({ socket, username, room }) {
   };
 
   useEffect(() => {
-    socket.on("receive_message", (data) => {
+    const handleReceiveMessage = (data) => {
       setMessageList((list) => [...list, data]);
-    });
+    };
+    socket.on("receive_message", handleReceiveMessage);
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
   }, [socket]);
 
   return (
@@ -36,20 +42,17 @@ function Chat({ socket, username, room }) {
       </div>
       <div className="chat-body">
         <ScrollToBottom className="message-container">
-          {messageList.map((messageContent) => {
+          {messageList.map((messageContent, index) => {
             return (
               <div
+                key={index}
                 className="message"
                 id={username === messageContent.author ? "you" : "other"}
               >
-                <div>
-                  <div className="message-content">
-                    <p>{messageContent.message}</p>
-                  </div>
-                  <div className="message-meta">
-                    <p id="time">{messageContent.time}</p>
-                    <p id="author">{messageContent.author}</p>
-                  </div>
+                <div className="message-meta">
+                  <span className="message-author">{messageContent.author}:</span>{" "}
+                  <span className="message-text">{messageContent.message}</span>
+                  <span className="message-time">{messageContent.time}</span>
                 </div>
               </div>
             );

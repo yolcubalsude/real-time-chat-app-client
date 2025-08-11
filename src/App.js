@@ -13,9 +13,19 @@ function App() {
   const joinRoom = () => {
     if (username !== "" && room !== "") {
       socket.emit("join_room", room);
+  
+      // Bilgilendirme mesajı gönder
+      socket.emit("send_message", {
+        room: room,
+        author: "System",
+        message: `${username} joined the room.`,
+        time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+      });
+  
       setShowChat(true);
     }
   };
+  
 
   return (
     <div className="App">
