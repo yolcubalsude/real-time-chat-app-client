@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
 
+// Or as a CSS color string
+function getRandomColor() {
+  return `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+}
+
 function Chat({ socket, username, room, initialMessages = [] }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState(initialMessages);
+  const [userColors, setUserColors] = useState({});
+
+  // Generate consistent colors for users
+  const getUserColor = (author) => {
+    if (!userColors[author]) {
+      const newColor = getRandomColor();
+      setUserColors(prev => ({ ...prev, [author]: newColor }));
+      return newColor;
+    }
+    return userColors[author];
+  };
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -57,7 +73,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
                 id={username === messageContent.author ? "you" : "other"}
               >
                 <div className="message-meta">
-                  <span className="message-author">{messageContent.author}:</span>{" "}
+                  <span className="message-author" style={{color: getUserColor(messageContent.author)}}>{messageContent.author}:</span>{" "}
                   <span className="message-text">{messageContent.message}</span>
                   <span className="message-time">{messageContent.time}</span>
                 </div>

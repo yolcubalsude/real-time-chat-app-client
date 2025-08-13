@@ -40,7 +40,6 @@ function App() {
         message: `${username} joined the room.`,
         time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
       });
-  
       setShowChat(true);
     }
   };
