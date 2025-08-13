@@ -1,8 +1,14 @@
+const mongoose = require("mongoose");
+require("dotenv").config();
 import "./App.css";
 import io from "socket.io-client";
 import { useState } from "react";
 import Chat from "./Chat";
 
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error(err));
+  
 const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:3001";
 const socket = io.connect(SOCKET_URL);
 
