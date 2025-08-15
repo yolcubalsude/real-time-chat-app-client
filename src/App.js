@@ -6,7 +6,7 @@ import Chat from "./Chat";
 
 
   
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:3001";
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "https://real-time-chat-app-server-uh7v.onrender.com/";
 const socket = io.connect(SOCKET_URL);
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
     if (username !== "" && room !== "") {
       socket.emit("join_room", room);
 
-
+      const SOCKET_URL = "https://real-time-chat-app-server-uh7v.onrender.com";
       // get all messages of that room via HTTP
       fetch(`${SOCKET_URL}/messages/${room}`)
         .then(res => res.json())
