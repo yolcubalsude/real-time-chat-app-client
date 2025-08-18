@@ -1,7 +1,9 @@
+/* Genel App */
 .App {
   text-align: center;
 }
 
+/* Logo */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -21,7 +23,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgb(255, 0, 0);
 }
 
 .App-link {
@@ -36,6 +38,65 @@
     transform: rotate(360deg);
   }
 }
+
+.joinChatContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #ff3e3e, #266f10);
+  padding: 20px;
+}
+
+.joinChatContainer h3 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.joinChatContainer input {
+  width: 280px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.2s ease-in-out;
+}
+
+.joinChatContainer input:focus {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.joinChatContainer button {
+  width: 280px;
+  padding: 12px;
+  margin-top: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #000000;
+  color: rgb(255, 255, 255);
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.joinChatContainer button:hover {
+  background: #ea5353;
+  transform: translateY(-2px);
+}
+
+.message {
+  display: flex;
+  margin: 6px 10px;
+}
+
 .message-content {
   display: flex;
   align-items: center;
@@ -54,7 +115,7 @@
 
 .time {
   font-size: 0.75em;
-  color: rgb(98, 0, 255);
+  color: rgb(166, 142, 205);
   margin-left: 8px;
 }
 
@@ -71,7 +132,7 @@
 
 .message-author {
   font-weight: bold;
-  color: #3b82f6;
+  color: #78859b;
 }
 
 .message-text {
@@ -84,17 +145,13 @@
   margin-left: 8px;
 }
 
-.message {
-  display: flex;
-  margin: 6px 10px;
-}
-
+/* Kullanıcıya göre mesaj hizalama */
 #you {
   justify-content: flex-end;
 }
 
 #you .message-meta {
-  background-color: #3b82f6;
+  background-color: #434249;
   color: #fff;
 }
 
@@ -113,9 +170,47 @@
 }
 
 #other .message-author {
-  
   color: #3b82f6;
 }
 
+.chat-footer {
+  display: flex;
+  padding: 12px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+}
 
+.chat-footer input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  outline: none;
+  font-size: 15px;
+  transition: all 0.2s ease-in-out;
+}
+
+.chat-footer input:focus {
+  border-color: #3300ff;
+  box-shadow: 0 0 6px rgba(59,130,246,0.3);
+}
+
+.chat-footer button {
+  margin-left: 10px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #044900, #ff0000);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-footer button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #0022ff, #00eaff);
+}
 

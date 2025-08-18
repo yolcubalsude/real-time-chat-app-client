@@ -11,6 +11,20 @@ function Chat({ socket, username, room, initialMessages = [] }) {
   const [messageList, setMessageList] = useState(initialMessages);
   const [userColors, setUserColors] = useState({});
 
+  
+  const createRoom = () => {
+    if (room !== "") {
+      socket.emit("create_room", { name: room, password: "1234" }, (response) => {
+        if (response.ok) {
+          console.log("Oda oluşturuldu:", response.room);
+        } else {
+          console.error("Oda oluşturulamadı:", response.error);
+        }
+      });
+    }
+  };
+  
+
   // Generate consistent colors for users
   const getUserColor = (author) => {
     if (!userColors[author]) {
