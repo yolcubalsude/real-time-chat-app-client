@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef } from "react";
 import ScrollToBottom from "react-scroll-to-bottom";
+
+
 
 // Or as a CSS color string
 function getRandomColor() {
@@ -10,18 +12,24 @@ function Chat({ socket, username, room, initialMessages = [] }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState(initialMessages);
   const [userColors, setUserColors] = useState({});
+  const [typingUsers, setTypingUsers] = useState([]); 
+  const stopTypingTimer = useRef(null);
+
+
 
   
-  const createRoom = () => {
-    if (room !== "") {
-      socket.emit("create_room", { name: room, password: "1234" }, (response) => {
-        if (response.ok) {
-          console.log("Oda oluşturuldu:", response.room);
-        } else {
-          console.error("Oda oluşturulamadı:", response.error);
-        }
-      });
-    }
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setCurrentMessage(value);
+
+    // yazıyor bilgisini hemen yayınla
+    socket.emit("typing", { room, username });
+
+    // 1 sn sonra yazmayı bıraktı olarak bildir (debounce)
+    if (stopTypingTimer.current) clearTimeout(stopTypingTimer.current);
+    stopTypingTimer.current = setTimeout(() => {
+      socket.emit("stop_typing", { room, username });
+    }, 1000);
   };
   
 
@@ -53,6 +61,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
     }
+    socket.emit("stop_typing", { room, username });
   };
 
   useEffect(() => {
@@ -66,11 +75,35 @@ function Chat({ socket, username, room, initialMessages = [] }) {
   }, [socket]);
 
   // Update messageList when initialMessages are loaded
-  useEffect(() => {
-    if (initialMessages.length > 0) {
-      setMessageList(initialMessages);
-    }
-  }, [initialMessages]);
+// 1. initialMessages load
+useEffect(() => {
+  if (initialMessages.length > 0) {
+    setMessageList(initialMessages);
+  }
+}, [initialMessages]);
+
+// 2. typing event listener
+useEffect(() => {
+  const onTyping = ({ username: u }) => {
+    if (!u || u === username) return;
+    setTypingUsers((prev) => (prev.includes(u) ? prev : [...prev, u]));
+  };
+
+  const onStopTyping = ({ username: u }) => {
+    if (!u) return;
+    setTypingUsers((prev) => prev.filter((name) => name !== u));
+  };
+
+  socket.on("typing", onTyping);
+  socket.on("stop_typing", onStopTyping);
+
+  return () => {
+    socket.off("typing", onTyping);
+    socket.off("stop_typing", onStopTyping);
+    if (stopTypingTimer.current) clearTimeout(stopTypingTimer.current);
+  };
+}, [socket, username, room]);
+
 
   return (
     <div className="chat-window">
@@ -91,6 +124,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
                   <span className="message-text">{messageContent.message}</span>
                   <span className="message-time">{messageContent.time}</span>
                 </div>
+                
               </div>
             );
           })}
@@ -101,15 +135,20 @@ function Chat({ socket, username, room, initialMessages = [] }) {
           type="text"
           value={currentMessage}
           placeholder="Hey..."
-          onChange={(event) => {
-            setCurrentMessage(event.target.value);
-          }}
+          onChange={handleInputChange}
           onKeyDown={(event) => {
             event.key === "Enter" && sendMessage();
           }}
-        />
+          
+        />{typingUsers.length > 0 && (
+          <div className="typing-indicator">
+             {typingUsers.join(", ")} yazıyor
+             <span className="dot"></span><span className="dot"></span><span className="dot"></span>
+          </div>
+            )}
         <button onClick={sendMessage}>&#9658;</button>
       </div>
+      
     </div>
   );
 }

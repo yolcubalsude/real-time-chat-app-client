@@ -11,24 +11,29 @@ const socket = io.connect(SOCKET_URL);
 
 function App() {
   const [username, setUsername] = useState("");
+  const [userPassword, setUserPassword] = useState("");
   const [room, setRoom] = useState("");
   const [showChat, setShowChat] = useState(false);
   const [loadedMessages, setLoadedMessages] = useState([]);
   const [createRoomId, setCreateRoomId] = useState("");
   const [createRoomPassword, setCreateRoomPassword] = useState("");
   const [createUsername, setCreateUsername] = useState("");
+  const [createUserPassword, setCreateUserPassword] = useState("");
   const [joinRoomId, setJoinRoomId] = useState("");
   const [joinRoomPassword, setJoinRoomPassword] = useState("");
   const [joinUsername, setJoinUsername] = useState("");
+  const [joinUserPassword, setJoinUserPassword] = useState("");
 
   const createRoom = () => {
-    if (createUsername && createRoomId && createRoomPassword) {
+    if (createUsername && createUserPassword && createRoomId && createRoomPassword) {
       setUsername(createUsername);
+      setUserPassword(createUserPassword);
   
       socket.emit("create_room", {
         roomId: createRoomId,
         password: createRoomPassword,
         username: createUsername,
+        userPassword: createUserPassword,
       });
   
       // Backend'den gelen yanıtı dinle
@@ -47,12 +52,10 @@ function App() {
   
 
    const joinRoomFunc = () => {
-    console.log("TESTTT")
-    if (joinUsername && joinRoomId && joinRoomPassword) {
-      console.log(joinUsername);
-      console.log(joinRoomId);
-      console.log(joinRoomPassword);
+    if (joinUsername  && joinUserPassword && joinRoomId && joinRoomPassword) {
+
       setUsername(joinUsername);
+      setUserPassword(joinUserPassword);
       setRoom(joinRoomId);
 
 
@@ -61,6 +64,7 @@ function App() {
         roomId: joinRoomId,
         password: joinRoomPassword,
         username: joinUsername,
+        userPassword: joinUserPassword,
       });
 
       fetch(`${SOCKET_URL}/messages/${joinRoomId}`)
@@ -84,6 +88,9 @@ function App() {
       });
       setShowChat(true);
     }
+    else {
+      alert("Kullanıcı adı, şifre, Oda ID ve Oda şifresi gerekli!");
+    }
   };
   
 
@@ -98,6 +105,12 @@ function App() {
               value={createUsername}
               onChange={(e) => setCreateUsername(e.target.value)}
             />
+               <input
+            type="password"
+            placeholder="User Password"
+            value={createUserPassword}
+            onChange={(e) => setCreateUserPassword(e.target.value)}
+          />
             <input
               type="text"
               placeholder="Room ID"
@@ -119,12 +132,19 @@ function App() {
             value={joinUsername}
             onChange={(e) => setJoinUsername(e.target.value)}
             />
+              <input
+            type="password"
+            placeholder="User Password"
+            value={joinUserPassword}
+            onChange={(e) => setJoinUserPassword(e.target.value)}
+          />
             <input
               type="text"
               placeholder="Room ID"
               value={joinRoomId}
               onChange={(e) => setJoinRoomId(e.target.value)}
             />
+            
             <input
               type="password"
               placeholder="Room Password"
@@ -137,6 +157,7 @@ function App() {
           <Chat
             socket={socket}
             username={username}
+            userPassword={userPassword}
             room={room}
             initialMessages={loadedMessages}
           />
