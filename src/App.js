@@ -23,12 +23,23 @@ function App() {
   const [joinRoomPassword, setJoinRoomPassword] = useState("");
   const [joinUsername, setJoinUsername] = useState("");
   const [joinUserPassword, setJoinUserPassword] = useState("");
+  const [joinError, setJoinError] = useState("");
+
+
+
+
+  const createUser = () => {
+    if(createUsername && createUserPassword ){
+      setUsername(createUsername);
+      setUserPassword(createUserPassword);
+    }
+  };
 
   const createRoom = () => {
     if (createUsername && createUserPassword && createRoomId && createRoomPassword) {
       setUsername(createUsername);
       setUserPassword(createUserPassword);
-  
+      
       socket.emit("create_room", {
         roomId: createRoomId,
         password: createRoomPassword,
@@ -56,37 +67,44 @@ function App() {
 
       setUsername(joinUsername);
       setUserPassword(joinUserPassword);
-      setRoom(joinRoomId);
+      setJoinError("");
 
 
       console.log("join")
       socket.emit("join_room", {
         roomId: joinRoomId,
-        password: joinRoomPassword,
+        password: joinRoomPassword, 
         username: joinUsername,
-        userPassword: joinUserPassword,
+      })
+
+      socket.once("join_success", ({ roomId }) => {
+        setRoom(roomId);
+
+        fetch(`${SOCKET_URL}/messages/${roomId}`)
+          .then(res => res.json())
+          .then(data => {
+            socket.emit("load_messages", data);
+            setLoadedMessages(data);
+            console.log("Loaded messages for room: ", data);
+          })
+          .catch(err => {
+            console.error("Failed to fetch messages:", err);
+          });
+
+        // Bilgilendirme mesajı gönder
+        socket.emit("send_message", {
+          room: roomId,
+          author: "System",
+          message: `${joinUsername} joined the room.`,
+          time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+        });
+        setShowChat(true);
       });
 
-      fetch(`${SOCKET_URL}/messages/${joinRoomId}`)
-        .then(res => res.json())
-        .then(data => {
-          socket.emit("load_messages", data);
-          setLoadedMessages(data);
-          console.log("Loaded messages for room: ", data);
-        })
-        .catch(err => {
-          console.error("Failed to fetch messages:", err);
-        });
-      
-  
-      // Bilgilendirme mesajı gönder
-      socket.emit("send_message", {
-        room: joinRoomId,
-        author: "System",
-        message: `${joinUsername} joined the room.`,
-        time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+      socket.once("join_error", ({ error }) => {
+        console.error(error);
+        setJoinError(error || "Join failed");
       });
-      setShowChat(true);
     }
     else {
       alert("Kullanıcı adı, şifre, Oda ID ve Oda şifresi gerekli!");
@@ -126,6 +144,11 @@ function App() {
             <button onClick={createRoom}>Create Room</button>
   
             <h3>Join Room</h3>
+            {joinError && (
+              <div className="error" style={{ color: "red", marginBottom: "8px" }}>
+                {joinError}
+              </div>
+            )}
             <input
             type="text"
             placeholder="Username"
