@@ -21,7 +21,7 @@
 
 /* Linkler */
 .App-link {
-  color: #ea7f33;
+  color: #ff0000;
   text-decoration: none;
   transition: color 0.2s;
 }
@@ -212,7 +212,7 @@
   background: linear-gradient(135deg, #ec4899, #f59e0b);
 }
 .switch-auth {
-  color: #ffd700;
+  color: #5100ff;
   margin-top: 12px;
   cursor: pointer;
   text-decoration: underline;
