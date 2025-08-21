@@ -35,7 +35,7 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
     });
 
     socket.once("join_success", ({ roomId }) => {
-      fetch(`${process.env.REACT_APP_SOCKET_URL}/messages/${roomId}`)
+      fetch(`${process.env.REACT_APP_API_URL}/messages/${roomId}`)
         .then((res) => res.json())
         .then((data) => setLoadedMessages(data))
         .catch((err) => console.error(err));
