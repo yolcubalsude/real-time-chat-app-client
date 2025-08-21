@@ -49,7 +49,7 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
 
   return (
     <div className="joinChatContainer">
-      <h3>Welcome, {user.username}</h3>
+      <h3>Welcome,{user.username}</h3>
 
       <h3>Create Room</h3>
       <input

@@ -8,7 +8,7 @@ function getRandomColor() {
   )}, ${Math.floor(Math.random() * 256)})`;
 }
 
-function Chat({ socket, username, room, initialMessages = [] }) {
+function Chat({ socket, user, room, initialMessages = [] }) {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState(initialMessages);
   const [userColors, setUserColors] = useState({});
@@ -20,12 +20,12 @@ function Chat({ socket, username, room, initialMessages = [] }) {
     setCurrentMessage(value);
 
     // yazıyor bilgisini hemen yayınla
-    socket.emit("typing", { room, username });
+    socket.emit("typing", { room, username: user.username });
 
     // 1 sn sonra yazmayı bıraktı olarak bildir (debounce)
     if (stopTypingTimer.current) clearTimeout(stopTypingTimer.current);
     stopTypingTimer.current = setTimeout(() => {
-      socket.emit("stop_typing", { room, username });
+      socket.emit("stop_typing", { room, username: user.username });
     }, 1000);
   };
 
@@ -43,7 +43,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
     if (currentMessage !== "") {
       const messageData = {
         room: room,
-        author: username,
+        author: user.username,
         message: currentMessage,
         time:
           new Date(Date.now()).getHours() +
@@ -57,7 +57,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
       setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
     }
-    socket.emit("stop_typing", { room, username });
+    socket.emit("stop_typing", { room, username: user.username });
   };
 
   useEffect(() => {
@@ -81,7 +81,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
   // 2. typing event listener
   useEffect(() => {
     const onTyping = ({ username: u }) => {
-      if (!u || u === username) return;
+      if (!u || u === user.username) return;
       setTypingUsers((prev) => (prev.includes(u) ? prev : [...prev, u]));
     };
 
@@ -98,13 +98,26 @@ function Chat({ socket, username, room, initialMessages = [] }) {
       socket.off("stop_typing", onStopTyping);
       if (stopTypingTimer.current) clearTimeout(stopTypingTimer.current);
     };
-  }, [socket, username, room]);
+  }, [socket, user.username, room]);
 
   return (
     <div className="chat-window">
-      <div className="chat-header">
-        <p>Live Chat</p>
+      <div
+        className="chat-header"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div className="chat-header">
+          <div className="header-bar">
+            <div className="room-box">{room}</div>
+            <div className="user-box">{user.username}</div>
+          </div>
+        </div>
       </div>
+
       <div className="chat-body">
         <ScrollToBottom className="message-container">
           {messageList.map((messageContent, index) => {
@@ -112,7 +125,7 @@ function Chat({ socket, username, room, initialMessages = [] }) {
               <div
                 key={index}
                 className="message"
-                id={username === messageContent.author ? "you" : "other"}
+                id={user.username === messageContent.author ? "you" : "other"}
               >
                 <div className="message-meta">
                   <span
