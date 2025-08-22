@@ -1,10 +1,4 @@
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
 import io from "socket.io-client";
 
 import Auth from "./pages/Auth";
@@ -19,7 +13,7 @@ const SOCKET_URL =
 const socket = io.connect(SOCKET_URL);
 
 function App() {
-  const [user, setUser] = useState(null); // { username, password }
+  const [user, setUser] = useState(null);
   const [room, setRoom] = useState("");
   const [loadedMessages, setLoadedMessages] = useState([]);
 

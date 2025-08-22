@@ -14,6 +14,8 @@ function Chat({ socket, user, room, initialMessages = [] }) {
   const [userColors, setUserColors] = useState({});
   const [typingUsers, setTypingUsers] = useState([]);
   const stopTypingTimer = useRef(null);
+  const [roomUsers, setRoomUsers] = useState([]);
+  const [showUsers, setShowUsers] = useState(false);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -100,6 +102,16 @@ function Chat({ socket, user, room, initialMessages = [] }) {
     };
   }, [socket, user.username, room]);
 
+  useEffect(() => {
+    socket.on("room_users", (users) => {
+      setRoomUsers(users);
+    });
+
+    return () => {
+      socket.off("room_users");
+    };
+  }, [socket]);
+
   return (
     <div className="chat-window">
       <div
@@ -111,6 +123,27 @@ function Chat({ socket, user, room, initialMessages = [] }) {
         }}
       >
         <div className="chat-header">
+          <span className="room-name">{room}</span>
+          <div className="user-section">
+            <span>{user.username}</span>
+            <button
+              className="ml-2 px-2 py-1 bg-gray-600 text-white rounded"
+              onClick={() => setShowUsers(!showUsers)}
+            ></button>
+
+            {showUsers && (
+              <div className="absolute top-12 right-4 bg-white shadow-lg rounded-lg p-3 w-48 max-h-60 overflow-y-auto z-50">
+                <h4 className="font-semibold mb-2">Users</h4>
+                <ul className="text-sm text-gray-700">
+                  {roomUsers.map((u, idx) => (
+                    <li key={idx} className="border-b last:border-0 py-1">
+                      {u.username}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
           <div className="header-bar">
             <div className="room-box">{room}</div>
             <div className="user-box">{user.username}</div>
