@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import JoinedRooms from "../components/JoinedRooms";
 
 function Rooms({ user, socket, setRoom, setLoadedMessages }) {
   const [createRoomId, setCreateRoomId] = useState("");
@@ -6,10 +7,12 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
   const [joinRoomId, setJoinRoomId] = useState("");
   const [joinRoomPassword, setJoinRoomPassword] = useState("");
   const [joinError, setJoinError] = useState("");
+  const [createMessage, setCreateMessage] = useState("");
 
   const createRoom = () => {
+    setCreateMessage("");
     if (!createRoomId || !createRoomPassword)
-      return alert("Oda ID ve şifre gerekli");
+      return setCreateMessage("Room ID and password are required");
 
     socket.emit("create_room", {
       roomId: createRoomId,
@@ -17,16 +20,17 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
       username: user.username,
     });
 
-    socket.once("room_created", ({ roomId }) => {
-      setRoom(roomId);
+    socket.once("room_created", ({ roomId, message }) => {
+      setCreateMessage(message || `Room created: ${roomId}`);
     });
 
-    socket.once("room_exists", ({ message }) => alert(message));
+    socket.once("room_exists", ({ message }) => setCreateMessage(message));
   };
 
   const joinRoom = () => {
+    setJoinError("");
     if (!joinRoomId || !joinRoomPassword)
-      return alert("Oda ID ve şifre gerekli");
+      return setJoinError("Room ID and password are required");
 
     socket.emit("join_room", {
       roomId: joinRoomId,
@@ -35,7 +39,7 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
     });
 
     socket.once("join_success", ({ roomId }) => {
-      fetch(`${process.env.REACT_APP_API_URL}/messages/${roomId}`)
+      fetch(`http://localhost:3001/messages/${roomId}`)
         .then((res) => res.json())
         .then((data) => setLoadedMessages(data))
         .catch((err) => console.error(err));
@@ -49,9 +53,16 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
 
   return (
     <div className="joinChatContainer">
-      <h3>Welcome,{user.username}</h3>
+      <h3>Welcome, {user.username}</h3>
 
+      <JoinedRooms
+        username={user.username}
+        socket={socket}
+        setRoom={setRoom}
+        setLoadedMessages={setLoadedMessages}
+      />
       <h3>Create Room</h3>
+      {createMessage && <div className="error">{createMessage}</div>}
       <input
         placeholder="Room ID"
         value={createRoomId}
