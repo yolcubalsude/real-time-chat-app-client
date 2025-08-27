@@ -37,9 +37,8 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
       roomPassword: joinRoomPassword,
       username: user.username,
     });
-
     socket.once("join_success", ({ roomId }) => {
-      fetch(`http://localhost:3001/messages/${roomId}`)
+      fetch(`${process.env.REACT_APP_API_URL}/messages/${roomId}`)
         .then((res) => res.json())
         .then((data) => setLoadedMessages(data))
         .catch((err) => console.error(err));
