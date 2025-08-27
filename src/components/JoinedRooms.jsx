@@ -13,6 +13,7 @@ function JoinedRooms({ username, socket, setRoom, setLoadedMessages }) {
         );
         const data = await res.json();
         setRooms(data);
+        console.log()
       } catch (err) {
         console.error(err);
         setRooms([]);
