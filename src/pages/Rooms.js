@@ -27,16 +27,12 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
       username: user.username,
     });
 
-    socket.once("room_created", ({ roomId }) => {
-      socket.emit("ensure_room_join", {
-        roomId: roomId,
-        username: user.username
-      });
-      setRoom(roomId);
-    });
-
-    socket.once("room_exists", ({ message }) => setCreateMessage(message));
-  };
+    socket.once("room_created", ({ roomId,message}) => {
+      
+    setCreateMessage(message||'Room created: ${roomId}');
+    
+  });
+  }
 
   const joinRoom = () => {
     setJoinError("");
