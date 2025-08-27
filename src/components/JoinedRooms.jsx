@@ -27,16 +27,16 @@ function JoinedRooms({ username, socket, setRoom, setLoadedMessages }) {
     socket.emit("join_room", {
       username,
       roomId,
-      bypassPassword: true, // şifre istemeden giriş
+      bypassPassword: true, 
     });
 
-    // Mesajları çek
+    
     axios
-      .get(`http://localhost:3001/messages/${roomId}`)
-      .then((res) => setLoadedMessages(res.data))
-      .catch((err) => console.error(err));
-
-    setRoom(roomId);
+    .get(`${process.env.REACT_APP_API_URL}/messages/${roomId}`)
+    .then((res) => setLoadedMessages(res.data))
+    .catch((err) => console.error(err));
+  
+  setRoom(roomId);
   };
 
   if (loading) return <div>Loading rooms...</div>;
