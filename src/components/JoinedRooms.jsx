@@ -2,14 +2,25 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function JoinedRooms({ username, socket, setRoom, setLoadedMessages }) {
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Kullanıcının geçmiş odalarını çek
-    axios
-      .get(`http://localhost:3001/user/${username}/rooms`) // local test için localhost
-      .then((res) => setRooms(res.data))
-      .catch((err) => console.error(err));
+    const fetchRooms = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_API_URL}/user/${username}/rooms`
+        );
+        const data = await res.json();
+        setRooms(data);
+      } catch (err) {
+        console.error(err);
+        setRooms([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRooms();
   }, [username]);
 
   const joinRoom = (roomId) => {
@@ -28,9 +39,11 @@ function JoinedRooms({ username, socket, setRoom, setLoadedMessages }) {
     setRoom(roomId);
   };
 
+  if (loading) return <div>Loading rooms...</div>;
+
   return (
     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-      {rooms.map((room) => (
+      {(rooms || []).map((room) => (
         <button
           key={room.roomId}
           onClick={() => joinRoom(room.roomId)}
