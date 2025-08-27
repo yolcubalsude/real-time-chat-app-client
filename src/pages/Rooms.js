@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import JoinedRooms from "../components/JoinedRooms";
+import { useTheme } from "../App";
+
+const API_URL =
+  process.env.REACT_APP_API_URL ||
+  process.env.REACT_APP_SOCKET_URL?.replace(/\/$/, "") ||
+  "http://localhost:3001";
 
 function Rooms({ user, socket, setRoom, setLoadedMessages }) {
+  const { isDarkMode, toggleTheme } = useTheme();
   const [createRoomId, setCreateRoomId] = useState("");
   const [createRoomPassword, setCreateRoomPassword] = useState("");
   const [joinRoomId, setJoinRoomId] = useState("");
@@ -20,8 +27,12 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
       username: user.username,
     });
 
-    socket.once("room_created", ({ roomId, message }) => {
-      setCreateMessage(message || `Room created: ${roomId}`);
+    socket.once("room_created", ({ roomId }) => {
+      socket.emit("ensure_room_join", {
+        roomId: roomId,
+        username: user.username
+      });
+      setRoom(roomId);
     });
 
     socket.once("room_exists", ({ message }) => setCreateMessage(message));
@@ -38,10 +49,16 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
       username: user.username,
     });
     socket.once("join_success", ({ roomId }) => {
-      fetch(`${process.env.REACT_APP_API_URL}/messages/${roomId}`)
+      fetch(`${API_URL}/messages/${roomId}`)
         .then((res) => res.json())
         .then((data) => setLoadedMessages(data))
         .catch((err) => console.error(err));
+      
+      socket.emit("ensure_room_join", {
+        roomId: roomId,
+        username: user.username
+      });
+      
       setRoom(roomId);
     });
 
@@ -52,7 +69,14 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
 
   return (
     <div className="joinChatContainer">
-      <h3>Welcome, {user.username}</h3>
+      <button 
+        className="theme-toggle-btn rooms-theme-btn"
+        onClick={toggleTheme}
+        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      >
+        {isDarkMode ? "☀️" : "🌙"}
+      </button>
+      <h3>Welcome {user.username}</h3>
 
       <JoinedRooms
         username={user.username}
@@ -82,9 +106,11 @@ function Rooms({ user, socket, setRoom, setLoadedMessages }) {
         onChange={(e) => setJoinRoomId(e.target.value)}
       />
       <input
+        type="password"
         placeholder="Room Password"
         value={joinRoomPassword}
         onChange={(e) => setJoinRoomPassword(e.target.value)}
+        autoComplete="current-password"
       />
       <button onClick={joinRoom}>Join Room</button>
     </div>
